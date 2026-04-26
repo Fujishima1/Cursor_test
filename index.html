@@ -3,76 +3,86 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Timer App</title>
+  <title>ポケモン図鑑</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="app">
-    <div class="header">
-      <h1 class="title">⏱ Timer</h1>
-      <div class="tab-bar">
-        <button class="tab active" data-tab="timer">タイマー</button>
-        <button class="tab" data-tab="stopwatch">ストップウォッチ</button>
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="pokeball-icon"></span>
+        <h1>ポケモン図鑑</h1>
+      </div>
+      <div class="search-wrap">
+        <input type="text" id="search" class="search-input" placeholder="名前または番号で検索..." autocomplete="off" />
+        <span class="search-icon">&#9906;</span>
       </div>
     </div>
+  </header>
 
-    <!-- Timer Panel -->
-    <div id="timer-panel" class="panel active">
-      <div class="ring-container">
-        <svg class="ring" viewBox="0 0 220 220">
-          <circle class="ring-bg" cx="110" cy="110" r="95" />
-          <circle class="ring-progress" id="timer-ring" cx="110" cy="110" r="95" />
-        </svg>
-        <div class="time-display" id="timer-display">00:00</div>
-      </div>
-
-      <div class="presets">
-        <button class="preset-btn" data-seconds="60">1分</button>
-        <button class="preset-btn" data-seconds="180">3分</button>
-        <button class="preset-btn" data-seconds="300">5分</button>
-        <button class="preset-btn" data-seconds="600">10分</button>
-        <button class="preset-btn" data-seconds="1500">25分</button>
-      </div>
-
-      <div class="input-row">
-        <input type="number" id="timer-input-min" class="time-input" placeholder="分" min="0" max="99" />
-        <span class="colon">:</span>
-        <input type="number" id="timer-input-sec" class="time-input" placeholder="秒" min="0" max="59" />
-        <button class="set-btn" id="timer-set">SET</button>
-      </div>
-
-      <div class="controls">
-        <button class="ctrl-btn secondary" id="timer-reset">リセット</button>
-        <button class="ctrl-btn primary" id="timer-start">スタート</button>
-      </div>
+  <main class="main">
+    <div class="type-filter" id="type-filter">
+      <button class="type-chip active" data-type="all">すべて</button>
     </div>
 
-    <!-- Stopwatch Panel -->
-    <div id="stopwatch-panel" class="panel">
-      <div class="ring-container">
-        <svg class="ring" viewBox="0 0 220 220">
-          <circle class="ring-bg" cx="110" cy="110" r="95" />
-          <circle class="ring-progress" id="sw-ring" cx="110" cy="110" r="95" />
-        </svg>
-        <div class="time-display" id="sw-display">00:00<span class="millis">.000</span></div>
-      </div>
+    <div id="pokemon-grid" class="pokemon-grid"></div>
 
-      <div class="controls">
-        <button class="ctrl-btn secondary" id="sw-lap">ラップ</button>
-        <button class="ctrl-btn primary" id="sw-start">スタート</button>
-        <button class="ctrl-btn secondary" id="sw-reset">リセット</button>
-      </div>
-
-      <ul class="lap-list" id="lap-list"></ul>
+    <div id="loading" class="loading hidden">
+      <div class="spinner"></div>
+      <p>読み込み中...</p>
     </div>
-  </div>
 
-  <!-- Alarm overlay -->
-  <div class="alarm-overlay hidden" id="alarm-overlay">
-    <div class="alarm-box">
-      <div class="alarm-icon">🔔</div>
-      <p class="alarm-text">時間になりました！</p>
-      <button class="ctrl-btn primary" id="alarm-dismiss">OK</button>
+    <div id="no-result" class="no-result hidden">
+      <p>ポケモンが見つかりませんでした</p>
+    </div>
+
+    <div class="pagination" id="pagination">
+      <button class="page-btn" id="prev-btn" disabled>&#10094; 前へ</button>
+      <span class="page-info" id="page-info"></span>
+      <button class="page-btn" id="next-btn">次へ &#10095;</button>
+    </div>
+  </main>
+
+  <!-- Detail Modal -->
+  <div class="modal-overlay hidden" id="modal-overlay">
+    <div class="modal" id="modal">
+      <button class="modal-close" id="modal-close">&#10005;</button>
+
+      <div class="modal-header" id="modal-header">
+        <div class="modal-sprites">
+          <img id="modal-sprite-front" class="modal-sprite" alt="" />
+          <img id="modal-sprite-back" class="modal-sprite" alt="" />
+        </div>
+        <div class="modal-title-block">
+          <span class="modal-number" id="modal-number"></span>
+          <h2 class="modal-name" id="modal-name"></h2>
+          <p class="modal-ja-name" id="modal-ja-name"></p>
+          <div class="modal-types" id="modal-types"></div>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-info-row">
+          <div class="info-box">
+            <span class="info-label">たかさ</span>
+            <span class="info-value" id="modal-height"></span>
+          </div>
+          <div class="info-box">
+            <span class="info-label">おもさ</span>
+            <span class="info-value" id="modal-weight"></span>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">とくせい</h3>
+          <div class="abilities" id="modal-abilities"></div>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">基本ステータス</h3>
+          <div class="stats" id="modal-stats"></div>
+        </div>
+      </div>
     </div>
   </div>
 
