@@ -11,6 +11,7 @@ let filteredPokemon = [];
 let currentPage = 1;
 let activeType = 'all';
 let searchQuery = '';
+const loadedTypes = new Set();
 
 // ── DOM refs ──────────────────────────────────────────────────────────────────
 const grid        = document.getElementById('pokemon-grid');
@@ -94,13 +95,11 @@ function applyFilters() {
   }
 
   if (activeType !== 'all') {
-    // We can't filter by type without fetching each pokemon, so we'll rely on cached data
-    list = list.filter(p => p.types && p.types.includes(activeType));
-    if (list.length === 0 && !allPokemon[0].types) {
-      // Types not yet loaded; load them first
+    if (!loadedTypes.has(activeType)) {
       loadTypePokemon(activeType);
       return;
     }
+    list = list.filter(p => p.types && p.types.includes(activeType));
   }
 
   filteredPokemon = list;
@@ -115,9 +114,10 @@ async function loadTypePokemon(type) {
     const typeIds = new Set(data.pokemon.map(p => extractId(p.pokemon.url)));
     allPokemon = allPokemon.map(p => {
       if (!p.types) p.types = [];
-      if (typeIds.has(p.id)) p.types.push(type);
+      if (typeIds.has(p.id) && !p.types.includes(type)) p.types.push(type);
       return p;
     });
+    loadedTypes.add(type);
     filteredPokemon = allPokemon.filter(p => p.types && p.types.includes(type));
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
